@@ -1,0 +1,59 @@
+Log on to Genome Center Server- Get username and password
+
+ssh USERNAME@cabernet.genomecenter.ucdavis.edu
+Will be prompted for password
+
+Download Data on SLIMS to Server
+
+wget -r -nH -nc -np --no-check-certificate -R index.html* "https://slims.bioinformatics.ucdavis.edu/Data/zqjp7oz9sd/"
+
+copy your new link in where the old example is. For this old link it would make a folder called "Data" in that folder you will find another folder called "zqjp7oz9sd" (the random string) that will contain the raw data. You can rename the random string later to make it easier to find things.  
+
+Merge Data Using Flash2
+#!/bin/bash
+##
+#SBATCH -n 4 
+#SBATCH -o /share/tearlab/Maga/Stephanie/Scripts/Flash2.out
+#SBATCH -e /share/tearlab/Maga/Stephanie/Scripts/Flash2.err
+#set -x
+INPUTS_DIR=/share/tearlab/Maga/Stephanie/mhlZ_Raw/SEQEM3/trimmed
+OUTPUTS_DIR=/share/tearlab/Maga/Stephanie/mhlZ_Worked/Merged/SEQEM3
+for f in $INPUTS_DIR/*_R1_001.trimmed.fastq
+do
+        fname=$(basename $f _R1_001.trimmed.fastq)
+        echo $fname
+        outfile=${OUTPUTS_DIR}/submit/$fname.Merged.sh
+        echo "#!/bin/bash" > $outfile
+        echo "##" >>$outfile
+        echo "#SBATCH -o ${OUTPUTS_DIR}/${fname}.Flash.out" >> $outfile
+        echo "#SBATCH -e ${OUTPUTS_DIR}/${fname}.Flash.err" >> $outfile
+        echo "module load flash2/c41a82e" >> $outfile
+    echo "flash2 ${INPUTS_DIR}/${fname}_R1_001.trimmed.fastq ${INPUTS_DIR}/${fname}_R2_001.trimmed.fastq -d ${OUTPUTS_DIR} -o $fname -r100 -f180 -s6$
+         sbatch $outfile
+done
+
+Trim Data Using Trimmomatic
+#!/bin/bash
+##
+#SBATCH -n 4
+##SBATCH -p gc256
+#SBATCH --mem 12000
+#SBATCH -o /share/tearlab/Maga/Stephanie/Scripts/trimmomatic_merged.out
+#SBATCH -e /share/tearlab/Maga/Stephanie/Scripts/trimmomatic_merged.err
+#SBATCH -t 3-00:00:00
+set -xe
+module load trimmomatic/0.33
+
+INPUTS_DIR=/share/tearlab/Maga/Stephanie/Merged/seqem2_raw
+OUTPUTS_DIR=/share/tearlab/Maga/Stephanie/Merged/seqem2_raw/merged_trimmed
+for pig in ${INPUTS_DIR}/*extendedFrags.fastq
+do
+     base=$(basename $pig .fastq)
+     echo $base
+     #baseR2=${base/_R1_/_R2_}
+    # echo $baseR2
+     mkdir -p ${INPUTS_DIR}/merged_trimmed
+     trimmomatic SE -threads 4 -phred33 ${INPUTS_DIR}/${base}.fastq \
+        ${OUTPUTS_DIR}/${base}.trimmed.fastq \
+         ILLUMINACLIP:adapter.fasta:2:30:10 LEADING:25 TRAILING:25 SLIDINGWINDOW:4:25 MINLEN:25 
+done
