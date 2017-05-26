@@ -1,0 +1,58 @@
+Look at both raw reads v merged/ trimmed reads using FASTQC
+
+Raw files:
+#!/bin/bash
+##
+#SBATCH -n 4
+#SBATCH -o /share/tearlab/Maga/Stephanie/Scripts/FastQc.out
+#SBATCH -e /share/tearlab/Maga/Stephanie/Scripts/FastQc.err
+
+OUTPUTS_DIR=/share/tearlab/Maga/Stephanie/FastQc/SEQEM2_raw
+INPUTS_DIR=/share/tearlab/Maga/Stephanie/mhlZ_Raw/SEQEM2
+for f in /share/tearlab/Maga/Stephanie/mhlZ_Raw/SEQEM2/*.fastq
+do
+        fname=$(basename $f .fastq)
+        echo $fname
+        outfile=${OUTPUTS_DIR}/submit/$fname.FQC.sh
+        echo "#!/bin/bash" > $outfile
+        echo "##" >> $outfile
+        echo "module load fastqc/v0.11.2" >> $outfile
+        echo "#SBATCH -o ${OUTPUTS_DIR}/${fname}.FastQC.out" >> $outfile
+        echo "#SBATCH -e ${OUTPUTS_DIR}/${fname}.FastQC.err" >> $outfile
+    echo "fastqc  ${INPUTS_DIR}/${fname}.fastq" >> $outfile
+        sbatch $outfile
+
+done
+
+Merged/Trimmed Files
+
+#!/bin/bash
+##
+#SBATCH -J FastQC.trim
+#SBATCH -n 4
+#SBATCH -o /share/tearlab/Maga/Stephanie/Scripts/FastQc.out
+#SBATCH -e /share/tearlab/Maga/Stephanie/Scripts/FastQc.err
+
+OUTPUTS_DIR=/share/tearlab/Maga/Stephanie/FastQc/SEQEM5
+INPUTS_DIR=/share/tearlab/Maga/Stephanie/mhlZ_Raw/SEQEM5/trimmed
+for f in /share/tearlab/Maga/Stephanie/mhlZ_Raw/SEQEM5/trimmed/*.trimmed.fastq
+do
+        fname=$(basename $f .trimmed.fastq)
+        echo $fname
+        outfile=${OUTPUTS_DIR}/submit/$fname.FQC.sh
+        echo "#!/bin/bash" > $outfile
+        echo "##" >> $outfile
+        echo "module load fastqc/v0.11.2" >> $outfile
+        echo "#SBATCH -o ${OUTPUTS_DIR}/${fname}.FastQC.out" >> $outfile
+        echo "#SBATCH -e ${OUTPUTS_DIR}/${fname}.FastQC.err" >> $outfile
+    echo "fastqc  ${INPUTS_DIR}/${fname}.trimmed.fastq" >> $outfile
+        sbatch $outfile
+
+done
+
+download html files to computer.  Can also run multiqc in order to summarize all fastqc files
+scp -r user@your.server.example.com:/path/to/foo /home/user/Desktop/
+
+multiqc /directory/with/fastqcfiles
+
+
