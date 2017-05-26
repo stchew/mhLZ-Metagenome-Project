@@ -9,6 +9,9 @@ wget -r -nH -nc -np --no-check-certificate -R index.html* "https://slims.bioinfo
 
 copy your new link in where the old example is. For this old link it would make a folder called "Data" in that folder you will find another folder called "zqjp7oz9sd" (the random string) that will contain the raw data. You can rename the random string later to make it easier to find things.  
 
+Kept files separated by lanes- for ease of testing code
+In order to adjust scripts to perform for loops in different directories, simply change the INPUTS/OUTPUTS_DIR variable paths
+
 Merge Data Using Flash2
 #!/bin/bash
 ##
@@ -57,3 +60,5 @@ do
         ${OUTPUTS_DIR}/${base}.trimmed.fastq \
          ILLUMINACLIP:adapter.fasta:2:30:10 LEADING:25 TRAILING:25 SLIDINGWINDOW:4:25 MINLEN:25 
 done
+
+***Must Merge first and then trim, had difficulty getting Merged files from trimmed first files***
