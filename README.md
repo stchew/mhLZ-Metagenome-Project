@@ -26,7 +26,6 @@ watch squeue -u : watches submited jobs (type username after -u)
 nano - opens text editor for writing/editing scripts
 
 When writing scripts inclde shebang and header usually:
-
 #!/bin/bash
 ##
 #SBATCH -o /share/tearlab/Maga/Stephanie/Scripts/mothur_fasta.out
