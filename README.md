@@ -7,7 +7,11 @@ ssh USERNAME@cabernet.genomecenter.ucdavis.edu
 Will be prompted for password
 
 Useful commands:
+
+
 cd - moves through directories
+
+
 cd .. - moves up 1 directory
 ls - look at content of directory
 sbatch - submits a job (script) into the queue (gets in line- use for large jobs/ for loops)
